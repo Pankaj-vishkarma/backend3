@@ -4,6 +4,7 @@ const database=require('./database/db.js')
 const router=require('./router/router.js')
 const app=express()
 const cors=require('cors')
+const cookieparser=require('cookie-parser')
 
 
 database()
@@ -13,6 +14,8 @@ app.use(cors(
         credentials:true
     }
 ))
+
+app.use(cookieparser())
 app.use(express.json())
 
 

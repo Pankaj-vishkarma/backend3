@@ -3,9 +3,9 @@ const userSchema=require('../schema/userSchema.js')
 const emailvalidator=require('email-validator')
 
 const signin=async(req,res)=>{
-    const {name,email,password,confirmpassword}=req.body
+    const {firstname,lastname,email,dateofbirth,mobile,address,password,confirmpassword}=req.body
 
-    if(!name || !email || !password || !confirmpassword)
+    if(!firstname || !lastname || !email || !dateofbirth || !mobile || !address || !password || !confirmpassword)
     {
         return res.status(400).json({
             success:false,
@@ -83,8 +83,17 @@ const signup=async(req,res)=>{
                 message:"invalied details"
             })
         }
+        
+        const token=user.jwtToken()
 
         user.password=undefined
+
+        const cookieOption={
+            maxAge:24*60*60*1000,
+            httpOnly:true
+        }
+
+        res.cookie('token',token,cookieOption)
 
         return res.status(200).json({
             success:true,
@@ -100,4 +109,43 @@ const signup=async(req,res)=>{
     }
 }
 
-module.exports={signin,signup}
+const profile=async(req,res)=>{
+    const userId=req.user.id
+     try{
+        const user=await userSchema.findById(userId)
+        return res.status(200).json({
+            success:true,
+            data:user
+        })
+     }catch(e)
+     {
+       return res.status(400).json({
+        success:false,
+        message:"e.message"
+       })
+     }
+}
+
+const logout=(req,res)=>{
+   try{
+        const cookieOption={
+            expires:new Date(),
+            httpOnly:true
+        }
+
+        res.cookie('token',null,cookieOption)
+        return res.status(200).json({
+            success:true,
+            message:"Logged out"
+        })
+
+   }catch(e)
+   {
+      res.status(400).json({
+        success:false,
+        message:e.message
+      })
+   }
+}
+
+module.exports={signin,signup,profile,logout}
