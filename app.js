@@ -10,7 +10,7 @@ const cookieparser=require('cookie-parser')
 database()
 app.use(cors(
     {
-        origin:["http://localhost:5173"],
+        origin:["https://registration-pankaj.netlify.app"],
         credentials:true
     }
 ))
