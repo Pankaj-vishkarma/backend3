@@ -84,7 +84,7 @@ const signup=async(req,res)=>{
             })
         }
         
-        const token=user.jwtToken()
+        const token=await user.jwtToken()
 
         user.password=undefined
 
