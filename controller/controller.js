@@ -2,6 +2,12 @@ const bcrypt=require('bcrypt')
 const userSchema=require('../schema/userSchema.js')
 const emailvalidator=require('email-validator')
 
+const cookieOption={
+            secure:process.env.NODE_ENV === 'production' ? true : false,
+            maxAge:24*60*60*1000,
+            httpOnly:true
+        }
+
 const signin=async(req,res)=>{
     const {firstname,lastname,email,dateofbirth,mobile,address,password,confirmpassword}=req.body
 
@@ -45,7 +51,9 @@ const signin=async(req,res)=>{
          
         const usserSave=userSchema(req.body)
         const result= await usserSave.save()
+        const token = await usserSave.jwtToken()
 
+        res.cookie('token',token,cookieOption)
         return res.status(200).json({
             success:true,
             data:result
@@ -87,11 +95,6 @@ const signup=async(req,res)=>{
         const token=await user.jwtToken()
 
         user.password=undefined
-
-        const cookieOption={
-            maxAge:24*60*60*1000,
-            httpOnly:true
-        }
 
         res.cookie('token',token,cookieOption)
 
